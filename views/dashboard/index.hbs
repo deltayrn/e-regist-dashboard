@@ -1,0 +1,221 @@
+<div class="row">
+  <div class="col-12">
+    <h2 class="content-heading mb-1 pt-1" style="border-bottom: 0px;">
+      Permintaan Seminggu Terakhir
+    </h2>
+  </div>
+  <div class="col-6 col-xl-3">
+    <a class="block block-link-shadow text-right" href="/request-draft?start={{data.date.start}}&end={{data.date.end}}">
+      <div class="block-content block-content-full clearfix">
+        <div class="float-left mt-10 d-none d-sm-block">
+          <i class="si si-menu fa-3x text-body-bg-dark"></i>
+        </div>
+        <div class="font-size-h3 font-w600">
+          {{data.countRequestToday}}
+        </div>
+        <div class="font-size-sm font-w600 text-uppercase text-muted">
+          Permintaan Masuk
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-xl-3">
+    <a class="block block-link-shadow text-right"
+      href="/request-draft/rejected?start={{data.date.start}}&end={{data.date.end}}">
+      <div class="block-content block-content-full clearfix">
+        <div class="float-left mt-10 d-none d-sm-block">
+          <i class="si si-trash fa-3x text-body-bg-dark"></i>
+        </div>
+        <div class="font-size-h3 font-w600">
+          {{data.countRequestDenied}}
+        </div>
+        <div class="font-size-sm font-w600 text-uppercase text-muted">
+          Permintaan Ditolak
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-xl-3">
+    <a class="block block-link-shadow text-right" href="/request-ktp?start={{data.date.start}}&end={{data.date.end}}">
+      <div class="block-content block-content-full clearfix">
+        <div class="float-left mt-10 d-none d-sm-block">
+          <i class="si si-doc fa-3x text-body-bg-dark"></i>
+        </div>
+        <div class="font-size-h3 font-w600">
+          {{data.countKTP}}
+        </div>
+        <div class="font-size-sm font-w600 text-uppercase text-muted">
+          Permintaan KTP
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-xl-3">
+    <a class="block block-link-shadow text-right" href="/request-kk?start={{data.date.start}}&end={{data.date.end}}">
+      <div class="block-content block-content-full clearfix">
+        <div class="float-left mt-10 d-none d-sm-block">
+          <i class="si si-docs fa-3x text-body-bg-dark"></i>
+        </div>
+        <div class="font-size-h3 font-w600">
+          {{data.countKK}}
+        </div>
+        <div class="font-size-sm font-w600 text-uppercase text-muted">
+          Permintaan KK
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+<div class="row">
+  <!-- Row #2 -->
+  <div class="col-md-6">
+    <div class="block">
+      <div class="block-header">
+        <h3 class="block-title">
+          Permintaan Masuk
+          <small>
+            7 Hari Terakhir
+          </small>
+        </h3>
+        <div class="block-options">
+          <button type="button" class="btn-block-option" data-toggle="block-option" data-action="state_toggle"
+            data-action-mode="demo">
+            <i class="si si-refresh"></i>
+          </button>
+        </div>
+      </div>
+      <div class="block-content block-content-full">
+        <div class="pull-all">
+          <canvas class="js-chartjs-dashboard-lines"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="block">
+      <div class="block-header">
+        <h3 class="block-title">
+          Permintaan Diproses
+          <small>
+            7 Hari Terakhir
+          </small>
+        </h3>
+        <div class="block-options">
+          <button type="button" class="btn-block-option" data-toggle="block-option" data-action="state_toggle"
+            data-action-mode="demo">
+            <i class="si si-refresh"></i>
+          </button>
+        </div>
+      </div>
+      <div class="block-content block-content-full">
+        <div class="pull-all">
+          <canvas class="js-chartjs-dashboard-lines2"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script defer>
+  const initDashboardChartJS = function () {
+    // Set Global Chart.js configuration
+    Chart.defaults.global.defaultFontColor = '#555555';
+    Chart.defaults.scale.gridLines.color = "transparent";
+    Chart.defaults.scale.gridLines.zeroLineColor = "transparent";
+    Chart.defaults.scale.display = false;
+    Chart.defaults.scale.ticks.beginAtZero = true;
+    Chart.defaults.global.elements.line.borderWidth = 2;
+    Chart.defaults.global.elements.point.radius = 5;
+    Chart.defaults.global.elements.point.hoverRadius = 7;
+    Chart.defaults.global.tooltips.cornerRadius = 3;
+    Chart.defaults.global.legend.display = false;
+
+    // Chart Containers
+    var chartDashboardLinesCon = jQuery('.js-chartjs-dashboard-lines');
+    var chartDashboardLinesCon2 = jQuery('.js-chartjs-dashboard-lines2');
+
+    // Chart Variables
+    var chartDashboardLines, chartDashboardLines2;
+
+    // Lines Charts Data
+    var chartDashboardLinesData = {
+      labels: {{{ json data.graph.request.label }}},
+      datasets: [
+        {
+          label: 'This Week',
+          fill: true,
+          backgroundColor: 'rgba(66,165,245,.45)',
+          borderColor: 'rgba(66,165,245,1)',
+          pointBackgroundColor: 'rgba(66,165,245,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(66,165,245,1)',
+          data: {{{ json data.graph.request.data }}}
+        }
+      ]
+    };
+
+    var chartDashboardLinesOptions = {
+      scales: {
+        yAxes: [{
+          ticks: {
+            suggestedMax: 50
+          }
+        }]
+      },
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItems, data) {
+            return ' ' + tooltipItems.yLabel + ' Request';
+          }
+        }
+      }
+    };
+
+    var chartDashboardLinesData2 = {
+      labels: {{{ json data.graph.processed.label }}},
+      datasets: [
+        {
+          label: 'This Week',
+          fill: true,
+          backgroundColor: 'rgba(156,204,101,.45)',
+          borderColor: 'rgba(156,204,101,1)',
+          pointBackgroundColor: 'rgba(156,204,101,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(156,204,101,1)',
+          data: {{{ json data.graph.processed.data }}}
+        }
+      ]
+    };
+
+    var chartDashboardLinesOptions2 = {
+      scales: {
+        yAxes: [{
+          ticks: {
+            suggestedMax: 50
+          }
+        }]
+      },
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItems, data) {
+            return ' ' + tooltipItems.yLabel + ' Request';
+          }
+        }
+      }
+    };
+
+    // Init Charts
+    if (chartDashboardLinesCon.length) {
+      chartDashboardLines = new Chart(chartDashboardLinesCon, { type: 'line', data: chartDashboardLinesData, options: chartDashboardLinesOptions });
+    }
+
+    if (chartDashboardLinesCon2.length) {
+      chartDashboardLines2 = new Chart(chartDashboardLinesCon2, { type: 'line', data: chartDashboardLinesData2, options: chartDashboardLinesOptions2 });
+    }
+  };
+
+  $(document).ready(function () {
+    initDashboardChartJS()
+  })
+</script>

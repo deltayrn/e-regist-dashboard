@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>{{#if title}}{{ title }}{{else}}Dashboard{{/if}}</title>
+  {{> css }}
+  {{> js}}
+</head>
+
+<body>
+  <div id="page-container" class="sidebar-o enable-page-overlay side-scroll page-header-modern main-content-boxed">
+    {{> sidebar }}
+    {{> header }}
+    <main id="main-container">
+      <div class="content">
+        {{{ body }}}
+      </div>
+    </main>
+    {{> footer }}
+  </div>
+</body>
+
+</html>

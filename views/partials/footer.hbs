@@ -1,0 +1,295 @@
+<div class="modal" id="request-ktp-detail" tabindex="-1" role="dialog" aria-labelledby="request-ktp-detail"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-primary-dark">
+          <h3 class="block-title">
+            Detail Request KTP
+          </h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="block-content">
+          <table class="table" id="table-detail-ktp">
+            <thead style="display:none;"></thead>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="request-kk-detail" tabindex="-1" role="dialog" aria-labelledby="request-kk-detail"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-primary-dark">
+          <h3 class="block-title">
+            Detail Request Kartu Keluarga
+          </h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="block-content">
+          <table class="table" id="table-detail-kk">
+            <thead style="display:none;"></thead>
+          </table>
+          <div class="row" id="kk-list"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script defer>
+  const popupDetail = function () {
+    let tableKK, tableKTP;
+
+    const init = () => {
+      tableKK = $('#table-detail-kk').DataTable({
+        ordering: false,
+        paging: false,
+        info: false,
+        searching: false,
+        processing: true,
+        columns: [{
+          data: "name",
+          class: "width-40",
+          title: "Name",
+        },
+        {
+          data: "value",
+          class: "width-60 font-weight-bold",
+          title: "Value",
+        },
+        ],
+      })
+
+      tableKTP = $('#table-detail-ktp').DataTable({
+        ordering: false,
+        paging: false,
+        info: false,
+        searching: false,
+        processing: true,
+        columns: [{
+          data: "name",
+          class: "width-40",
+          title: "Name",
+        },
+        {
+          data: "value",
+          class: "width-60 font-weight-bold",
+          title: "Value",
+        },
+        ],
+      })
+    }
+
+    const openDetail = (param) => {
+      param = JSON.parse(param)
+
+      if (param.type == 'ktp_update' || param.type == 'ktp_new') {
+        openDetailKTP(param)
+      } else {
+        openDetailKK(param)
+      }
+    }
+
+    const openDetailKTP = (param) => {
+      const detail = [
+        { name: 'Tipe', value: (param.type == 'ktp_new' ? 'Pembuatan KTP Baru' : 'Update KTP Lama') },
+        { name: 'Requestor', value: param.user.fullName },
+        { name: 'Nama Lengkap', value: param.data_ktp.nama },
+        { name: 'Tempat Lahir', value: param.data_ktp.tempat_lahir },
+        { name: 'Tangggal Lahir', value: param.data_ktp.tanggal_lahir_formatted },
+        { name: 'Jenis Kelamin', value: (param.data_ktp.jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan') },
+        { name: 'Agama', value: param.data_ktp.agama },
+        { name: 'Status Perkawinan', value: param.data_ktp.status_perkawinan },
+        { name: 'Pekerjaan', value: param.data_ktp.pekerjaan },
+      ];
+
+      if (param.type == 'ktp_update') {
+        detail.splice(3, 0, { name: 'NIK', value: param.data_ktp.nik })
+      }
+
+      tableKTP.clear();
+      detail.forEach(det => tableKTP.row.add(det))
+      tableKTP.draw();
+      $('#request-ktp-detail').modal('show')
+    }
+
+    const openDetailKK = (param) => {
+      const detail = [
+        { name: 'Tipe', value: (param.type == 'kk_new' ? 'Pembuatan KK Baru' : 'Update KK Lama') },
+        { name: 'Requestor', value: param.user.fullName },
+      ];
+
+      if (param.type == 'kk_update') {
+        detail.push({ name: 'Nomor KK', value: param.no_kk })
+      }
+
+      $('#kk-list').empty()
+      param.data_kk.forEach((person, idx) => {
+        $('#kk-list').append(`
+          <div class="col-md-6">
+            <h5>
+              Anggota ${idx + 1}
+            </h5>
+            <table class="table table-striped table-sm mb-30">
+              <tr>
+                <td>
+                  Nama
+                </td>
+                <td class="font-weight-bold">
+                  ${person.nama}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  NIK
+                </td>
+                <td class="font-weight-bold">
+                  ${person.nik}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Peran Keluarga
+                </td>
+                <td class="font-weight-bold">
+                  ${person.role}
+                </td>
+              </tr>
+              </tr>
+              <tr>
+                <td>
+                  Nama Ayah
+                </td>
+                <td class="font-weight-bold">
+                  ${person.nama_ayah}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Nama Ibu
+                </td>
+                <td class="font-weight-bold">
+                  ${person.nama_ibu}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Jenis Kelamin
+                </td>
+                <td class="font-weight-bold">
+                  ${person.jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan'}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Agama
+                </td>
+                <td class="font-weight-bold">
+                  ${person.agama}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Tempat Lahir
+                </td>
+                <td class="font-weight-bold">
+                  ${person.tempat_lahir}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Tanggal Lahir
+                </td>
+                <td class="font-weight-bold">
+                  ${person.tanggal_lahir_formatted}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Pekerjaan
+                </td>
+                <td class="font-weight-bold">
+                  ${person.pekerjaan}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Pendidikan
+                </td>
+                <td class="font-weight-bold">
+                  ${person.pendidikan}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Pekerjaan
+                </td>
+                <td class="font-weight-bold">
+                  ${person.pekerjaan}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Status Perkawinan
+                </td>
+                <td class="font-weight-bold">
+                  ${person.status_perkawinan}
+                </td>
+              </tr>
+            </table>
+          </div>
+        `)
+      })
+
+      tableKK.clear();
+      detail.forEach(det => tableKK.row.add(det))
+      tableKK.draw();
+      $('#request-kk-detail').modal('show')
+    }
+
+    return { init, openDetail }
+  }()
+
+  $(document).ready(function () {
+    popupDetail.init()
+  })
+</script>
+
+<footer id="page-footer" class="opacity-0">
+  <div class="content py-20 font-size-xs clearfix">
+    <div class="float-right">
+      eRegist System
+    </div>
+    <div class="float-left">
+      <a class="font-w600" href="/" target="_blank">
+        Delta Setiyarini
+      </a>
+      ©
+      <span class="js-year-copy">
+        2020
+      </span>
+    </div>
+  </div>
+</footer>
